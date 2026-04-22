@@ -236,10 +236,10 @@ async function main(): Promise<void> {
   console.log('──────────────────────────────────────────');
   console.log('');
   console.log('1) One-time KV namespace creation (if not yet done):');
-  console.log('   pnpm wrangler kv:namespace create TOKENS');
+  console.log('   pnpm wrangler kv namespace create google-tasks-mcp-TOKENS');
   console.log('   # paste the returned id into wrangler.toml (copy from wrangler.toml.example)');
   console.log('');
-  console.log('2) Secrets:');
+  console.log('2) Secrets (always remote — no --local/--remote flag needed):');
   console.log('   pnpm wrangler secret put GOOGLE_CLIENT_ID');
   console.log(`     ↳ value: ${clientId}`);
   console.log('   pnpm wrangler secret put GOOGLE_CLIENT_SECRET');
@@ -247,16 +247,17 @@ async function main(): Promise<void> {
   console.log('   pnpm wrangler secret put MCP_SHARED_SECRET');
   console.log('     ↳ value: $(openssl rand -base64 32)');
   console.log('');
-  console.log('3) Google Tasks tokens into the TOKENS KV namespace:');
+  console.log('3) Google Tasks tokens into the TOKENS KV namespace (--remote is mandatory');
+  console.log('   on wrangler v4 — the default is --local, a local simulator):');
   console.log(
-    `   pnpm wrangler kv:key put --binding=TOKENS refresh_token '${tokens.refresh_token}'`,
+    `   pnpm wrangler kv key put --remote --binding=TOKENS refresh_token '${tokens.refresh_token}'`,
   );
   console.log(
-    `   pnpm wrangler kv:key put --binding=TOKENS access_token  '${tokens.access_token}'`,
+    `   pnpm wrangler kv key put --remote --binding=TOKENS access_token  '${tokens.access_token}'`,
   );
-  console.log(`   pnpm wrangler kv:key put --binding=TOKENS expires_at    '${expiresAt}'`);
+  console.log(`   pnpm wrangler kv key put --remote --binding=TOKENS expires_at    '${expiresAt}'`);
   console.log('');
-  console.log('4) Deploy: pnpm deploy');
+  console.log('4) Deploy: pnpm run deploy');
   console.log('');
   console.log('5) Register the URL in Claude.ai → Settings → Custom Connectors:');
   console.log('   https://<your-worker-host>/mcp/<MCP_SHARED_SECRET>');
