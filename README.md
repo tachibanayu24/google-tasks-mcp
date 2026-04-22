@@ -59,7 +59,7 @@ Google Tasks API 特有の挙動 (`due` は時刻破棄 / `clear_completed` は 
 ## 前提
 
 - Google アカウント (Google Tasks を普段使いしているもの)
-- Google Cloud OAuth Client: **Desktop app タイプ**、redirect URI に `http://127.0.0.1:8787/google-tasks/callback` を登録
+- Google Cloud OAuth Client: **Desktop app タイプ** (ループバック callback は自動許可なので redirect URI の事前登録は不要)
 - [Google Tasks API](https://console.cloud.google.com/apis/library/tasks.googleapis.com) を同プロジェクトで有効化
 - Cloudflare Workers (Free プランで十分) + `wrangler` CLI でログイン済み
 - Node.js 20+ / pnpm 9+
@@ -79,12 +79,16 @@ pnpm install
 ### 2. Google Cloud OAuth Client を作成
 
 1. [Google Cloud Console](https://console.cloud.google.com/) で新規プロジェクトを作成 (または既存を選択)
-2. **APIs & Services → Library** で **Google Tasks API** を有効化
-3. **APIs & Services → OAuth consent screen** を設定 (User type: External、自分のメールをテストユーザに追加)
-4. **APIs & Services → Credentials** → **+ CREATE CREDENTIALS** → **OAuth client ID**
-   - Application type: **Desktop app**
-   - Authorized redirect URIs に `http://127.0.0.1:8787/google-tasks/callback` を追加
-5. 発行された `Client ID` と `Client secret` をメモ
+2. **API とサービス → ライブラリ** で **Google Tasks API** を有効化
+3. **API とサービス → OAuth 同意画面** を設定
+   - User Type: **外部**
+   - テストユーザーに自分の Google アカウントを追加
+4. **API とサービス → 認証情報** → **+ 認証情報を作成** → **OAuth クライアント ID**
+   - **アプリケーションの種類**: **デスクトップ アプリ**
+   - 名前は任意 (例: `google-tasks-mcp-cli`)
+   - → **作成**
+   - ℹ️ デスクトップ アプリ タイプではリダイレクト URI 設定欄は UI に出てこない。ループバック (`http://127.0.0.1:*` / `http://localhost:*`) は自動許可されるため事前登録は不要 ([Google 公式ドキュメント](https://developers.google.com/identity/protocols/oauth2/native-app#loopback))。
+5. 発行された **クライアント ID** と **クライアント シークレット** をメモ
 
 ### 3. 初回 OAuth 認可 (ローカル 1 回だけ)
 

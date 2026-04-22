@@ -161,10 +161,15 @@ async function main(): Promise<void> {
   if (!clientId || !clientSecret) {
     console.error('Error: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set.');
     console.error('');
-    console.error('  1. In Google Cloud console, create an OAuth 2.0 Client (type: Desktop app).');
+    console.error(
+      '  1. In Google Cloud console, create an OAuth 2.0 Client of type "Desktop app".',
+    );
     console.error('     Enable Google Tasks API in the same project.');
     console.error(
-      `     Authorized redirect URI: http://${CALLBACK_HOST}:${CALLBACK_PORT}${CALLBACK_PATH}`,
+      `     (No redirect URI registration needed — loopback is auto-allowed for Desktop app.`,
+    );
+    console.error(
+      `      The CLI will receive the callback at http://${CALLBACK_HOST}:${CALLBACK_PORT}${CALLBACK_PATH}.)`,
     );
     console.error('  2. Export the values:');
     console.error('     export GOOGLE_CLIENT_ID=...');
@@ -194,7 +199,7 @@ async function main(): Promise<void> {
   console.log('Google Tasks OAuth bootstrap');
   console.log('────────────────────────────');
   console.log('');
-  console.log('Callback URL (must exactly match the Google Cloud OAuth client settings):');
+  console.log('Callback URL (loopback — auto-allowed for Desktop app, no registration needed):');
   console.log(`  ${redirectUri}`);
   console.log('');
   console.log('Opening authorization URL in your default browser…');
