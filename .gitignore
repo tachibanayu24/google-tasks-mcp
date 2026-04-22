@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars
+.dev.vars.*
+# Each fork has its own KV namespace ids — keep local wrangler.toml out of VCS.
+# wrangler.toml.example is the committed template.
+wrangler.toml
+
+# Environment
+.env
+.env.*
+!.env.example
+*.local
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json.example
+
+# Local Google Tasks token dumps (safety net — must NEVER be committed)
+google-tasks-tokens.json
+google-tasks-tokens.*.json
+tokens.local.json

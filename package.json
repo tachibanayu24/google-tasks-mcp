@@ -1,0 +1,37 @@
+{
+  "name": "google-tasks-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Google Tasks on Cloudflare Workers. Streamable HTTP transport; designed for Claude mobile via Custom Connector.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Yuto Tachibana",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "setup:google-tasks": "tsx scripts/setup-google-tasks.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@hono/mcp": "^0.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "hono": "^4.7.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2",
+    "@cloudflare/workers-types": "^4.20260421.1",
+    "@types/node": "^22",
+    "tsx": "^4",
+    "typescript": "^5.7",
+    "vitest": "^2",
+    "wrangler": "^4"
+  }
+}
