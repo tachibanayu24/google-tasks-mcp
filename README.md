@@ -82,7 +82,8 @@ pnpm install
 2. **API とサービス → ライブラリ** で **Google Tasks API** を有効化
 3. **API とサービス → OAuth 同意画面** を設定
    - User Type: **外部**
-   - テストユーザーに自分の Google アカウントを追加
+   - ⚠️ 設定後、**「アプリを公開」で公開ステータスを「本番環境 (In production)」にすること。** 「テスト (Testing)」のままだと Google が refresh_token を **7 日で失効**させ、1 週間ごとに再認可が必要になる。`auth/tasks` は sensitive scope だが Google の verification は不要 (認可時に「未確認のアプリ」警告が出るだけ)。本番ステータスで発行した refresh_token は revoke / 6 ヶ月未使用 / パスワード変更まで生き続ける。
+   - (テストモードのまま試す場合のみ、テストユーザーに自分の Google アカウントを追加。ただし上記の 7 日失効に注意。)
 4. **API とサービス → 認証情報** → **+ 認証情報を作成** → **OAuth クライアント ID**
    - **アプリケーションの種類**: **デスクトップ アプリ**
    - 名前は任意 (例: `google-tasks-mcp-cli`)
@@ -199,6 +200,25 @@ Claude mobile/desktop
 | secret 漏洩時の他 IP からのアクセス | `CF-Connecting-IP` が Anthropic outbound CIDR (`160.79.104.0/21`) に含まれるかで二層目の制限 |
 | Google OAuth token の漏洩 | `wrangler kv` と `wrangler secret` (暗号化保存)。`.dev.vars` と `wrangler.toml` は `.gitignore` |
 | refresh_token の revocation | `GoogleAuthError` 発生時は Claude にヒントを返して `setup:google-tasks` の再実行を促す |
+
+---
+
+## トラブルシュート: 認証が切れたとき
+
+Claude から Google Tasks にアクセスできなくなった場合 (`GoogleAuthError` / refresh 失敗)、ほぼ **refresh_token の失効**。KV にトークン 3 点が揃っていても Google 側で無効化されていれば起きる。
+
+**まず根本原因を潰す**: OAuth 同意画面の公開ステータスが「テスト (Testing)」だと refresh_token は **7 日で失効**する。[OAuth 同意画面](https://console.cloud.google.com/auth/audience) を開き、**「本番環境 (In production)」に公開**しておく (セットアップ手順 2-3 の ⚠️ 参照)。
+
+**復旧手順** (Worker のコードは無変更なので `deploy` 不要、KV だけ差し替え):
+
+```bash
+export GOOGLE_CLIENT_ID="<Client ID>"
+export GOOGLE_CLIENT_SECRET="<Client secret>"
+pnpm run setup:google-tasks
+# → ブラウザで承認 → 出力された `wrangler kv key put --remote` 3 本をそのまま実行
+```
+
+`client_secret` は Worker secret なので読み出せない (KV の refresh_token だけを手で直すことは不可)。必ず setup を再実行して新しいトークン一式を取り直すこと。本番ステータスで発行した refresh_token は revoke / 6 ヶ月未使用 / パスワード変更まで失効しない。
 
 ---
 
